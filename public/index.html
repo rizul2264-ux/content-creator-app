@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Content Creator Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #fff; min-height: 100vh; }
+
+    header {
+      background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+      padding: 20px 30px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.8rem; font-weight: 700; }
+    header p { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 22px;
+      border-radius: 25px;
+      border: 2px solid #833ab4;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    .tab.active, .tab:hover {
+      background: linear-gradient(135deg, #833ab4, #fd1d1d);
+      border-color: transparent;
+    }
+
+    .section { display: none; max-width: 750px; margin: 0 auto; padding: 0 20px 40px; }
+    .section.active { display: block; }
+
+    .card {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 10px;
+    }
+    .card h2 { font-size: 1.2rem; margin-bottom: 16px; }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    input:focus, select:focus { outline: none; border-color: #833ab4; }
+
+    button.generate {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #833ab4, #fd1d1d);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button.generate:hover { opacity: 0.85; }
+    button.generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result {
+      margin-top: 20px;
+      background: #111;
+      border-radius: 12px;
+      padding: 18px;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      font-size: 0.95rem;
+      display: none;
+      border: 1px solid #2a2a2a;
+    }
+    .result.show { display: block; }
+
+    .copy-btn {
+      margin-top: 10px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid #833ab4;
+      background: transparent;
+      color: #833ab4;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .copy-btn:hover { background: #833ab4; color: #fff; }
+
+    .loader { text-align: center; padding: 20px; color: #888; display: none; }
+    .loader.show { display: block; }
+
+    .emoji { font-size: 1.5rem; margin-right: 8px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 Content Creator Dashboard</h1>
+  <p>AI-powered tools for Instagram Reels creators</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('ideas')">💡 Ideas</button>
+  <button class="tab" onclick="showTab('caption')">✍️ Captions</button>
+  <button class="tab" onclick="showTab('hashtags')">🔥 Hashtags</button>
+  <button class="tab" onclick="showTab('schedule')">📅 Schedule</button>
+</div>
+
+<!-- IDEAS -->
+<div class="section active" id="ideas">
+  <div class="card">
+    <h2><span class="emoji">💡</span>Reel Idea Generator</h2>
+    <input type="text" id="ideas-niche" placeholder="Apna niche likho (e.g. fitness, cooking, tech, comedy)" />
+    <button class="generate" onclick="generate('ideas')">Ideas Generate Karo</button>
+    <div class="loader" id="ideas-loader">AI soch rahi hai... ✨</div>
+    <div class="result" id="ideas-result"></div>
+    <button class="copy-btn" id="ideas-copy" style="display:none" onclick="copy('ideas-result')">Copy Karo</button>
+  </div>
+</div>
+
+<!-- CAPTION -->
+<div class="section" id="caption">
+  <div class="card">
+    <h2><span class="emoji">✍️</span>Caption Writer</h2>
+    <input type="text" id="caption-topic" placeholder="Reel ka topic likho (e.g. morning routine, 5 tips for fitness)" />
+    <button class="generate" onclick="generate('caption')">Caption Likho</button>
+    <div class="loader" id="caption-loader">Caption ban raha hai... ✨</div>
+    <div class="result" id="caption-result"></div>
+    <button class="copy-btn" id="caption-copy" style="display:none" onclick="copy('caption-result')">Copy Karo</button>
+  </div>
+</div>
+
+<!-- HASHTAGS -->
+<div class="section" id="hashtags">
+  <div class="card">
+    <h2><span class="emoji">🔥</span>Hashtag Finder</h2>
+    <input type="text" id="hashtags-topic" placeholder="Topic likho (e.g. workout, skincare, travel)" />
+    <button class="generate" onclick="generate('hashtags')">Hashtags Dhundo</button>
+    <div class="loader" id="hashtags-loader">Best hashtags dhundh raha hoon... ✨</div>
+    <div class="result" id="hashtags-result"></div>
+    <button class="copy-btn" id="hashtags-copy" style="display:none" onclick="copy('hashtags-result')">Copy Karo</button>
+  </div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="section" id="schedule">
+  <div class="card">
+    <h2><span class="emoji">📅</span>Posting Schedule</h2>
+    <input type="text" id="schedule-niche" placeholder="Tera niche likho (e.g. lifestyle, comedy, tech)" />
+    <select id="schedule-frequency">
+      <option value="7">7 din ka schedule</option>
+      <option value="14">14 din ka schedule</option>
+      <option value="30">30 din ka schedule</option>
+    </select>
+    <button class="generate" onclick="generate('schedule')">Schedule Banao</button>
+    <div class="loader" id="schedule-loader">Schedule plan ho raha hai... ✨</div>
+    <div class="result" id="schedule-result"></div>
+    <button class="copy-btn" id="schedule-copy" style="display:none" onclick="copy('schedule-result')">Copy Karo</button>
+  </div>
+</div>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  async function generate(type) {
+    const btn = document.querySelector(`#${type} .generate`);
+    const loader = document.getElementById(`${type}-loader`);
+    const result = document.getElementById(`${type}-result`);
+    const copyBtn = document.getElementById(`${type}-copy`);
+
+    let body = {};
+    if (type === 'ideas') body = { niche: document.getElementById('ideas-niche').value };
+    if (type === 'caption') body = { topic: document.getElementById('caption-topic').value };
+    if (type === 'hashtags') body = { topic: document.getElementById('hashtags-topic').value };
+    if (type === 'schedule') body = {
+      niche: document.getElementById('schedule-niche').value,
+      frequency: document.getElementById('schedule-frequency').value
+    };
+
+    if (!Object.values(body).some(v => v)) return alert('Pehle kuch likho!');
+
+    btn.disabled = true;
+    loader.classList.add('show');
+    result.classList.remove('show');
+    copyBtn.style.display = 'none';
+
+    try {
+      const res = await fetch(`/api/${type}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      result.textContent = data.result;
+      result.classList.add('show');
+      copyBtn.style.display = 'inline-block';
+    } catch (e) {
+      result.textContent = 'Kuch error aa gaya. Dobara try karo.';
+      result.classList.add('show');
+    }
+
+    btn.disabled = false;
+    loader.classList.remove('show');
+  }
+
+  function copy(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => alert('Copy ho gaya!'));
+  }
+</script>
+
+</body>
+</html>
