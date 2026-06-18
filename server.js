@@ -15,6 +15,10 @@ async function ask(prompt) {
   return result.response.text();
 }
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.post('/api/ideas', async (req, res) => {
   const { niche } = req.body;
   const text = await ask(
